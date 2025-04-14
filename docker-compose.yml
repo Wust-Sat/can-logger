@@ -1,0 +1,10 @@
+services:
+  python_test:
+    build:
+      context: .
+    container_name: wust-sat-test
+    restart: "no"
+    volumes:
+      - ${PWD}:/app
+    command: |
+      poetry run python3 -m pytest .
