@@ -1,10 +1,27 @@
 services:
-  python_test:
-    build:
-      context: .
-    container_name: wust-sat-test
+  can-logger:
+    build: .
+    container_name: can_logger
+    privileged: true
+    network_mode: host
     restart: "no"
+    environment:
+      - PYTHONUNBUFFERED=1
     volumes:
       - ${PWD}:/app
-    command: |
-      poetry run python3 -m pytest .
+    command: >
+      poetry run python3 can_logger/sniffer.py -i vcan0
+
+  can-sender:
+    build: .
+    container_name: can_sender
+    privileged: true
+    network_mode: host
+    command: ["cangen", "vcan0"]
+
+  # can-sniffer:
+  #   build: .
+  #   container_name: can_sniffer
+  #   privileged: true
+  #   network_mode: host
+  #   command: ["candump", "vcan0"]
