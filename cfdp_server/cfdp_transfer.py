@@ -20,7 +20,7 @@ SOURCE_ENTITY_ID_BYTES = b"\x00\x01"  # Example Source ID 1
 DESTINATION_ENTITY_ID_BYTES = b"\x00\x02"  # Example Destination ID 2
 TRANSACTION_SEQ_NUM_BYTES = b"\x00\x00\x00\x01"  # Example Transaction Sequence Number 1
 SOURCE_FILE = pathlib.Path("/tmp/src-file.txt")
-DESTINATION_FILE = pathlib.Path("/.txt")
+DESTINATION_FILE = pathlib.Path("dupa.txt")
 FILE_SEGMENT_SIZE = 256 - 12
 TRANSMISSION_MODE = TransmissionMode.UNACKNOWLEDGED
 
@@ -69,8 +69,8 @@ metadata_params = MetadataParams(
     closure_requested=False,  # No closure request in unacknowledged mode
     checksum_type=ChecksumType.MODULAR,
     file_size=file_size,
-    source_file_name=str(SOURCE_FILE.name), # Send only the name usually
-    dest_file_name=str(DESTINATION_FILE),
+    source_file_name=str(SOURCE_FILE), # Send only the name usually
+    dest_file_name=str("dupa.txt"),
     # options=None # No TLV options for this basic example
 )
 metadata_pdu = MetadataPdu(pdu_conf=pdu_conf, params=metadata_params)
