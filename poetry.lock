@@ -182,6 +182,32 @@ files = [
 ]
 
 [[package]]
+name = "crcmod"
+version = "1.7"
+description = "CRC Generator"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "crcmod-1.7.tar.gz", hash = "sha256:dc7051a0db5f2bd48665a990d3ec1cc305a466a77358ca4492826f41f283601e"},
+]
+
+[[package]]
+name = "deprecation"
+version = "2.1.0"
+description = "A library to handle automated deprecations"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "deprecation-2.1.0-py2.py3-none-any.whl", hash = "sha256:a10811591210e1fb0e768a8c25517cabeabcba6f0bf96564f8ff45189f90b14a"},
+    {file = "deprecation-2.1.0.tar.gz", hash = "sha256:72b3bde64e5d778694b0cf68178aed03d15e15477116add3fb773e581f9518ff"},
+]
+
+[package.dependencies]
+packaging = "*"
+
+[[package]]
 name = "diskcache"
 version = "5.6.3"
 description = "Disk Cache -- Disk and file backed persistent cache."
@@ -408,6 +434,22 @@ viewer = ["windows-curses"]
 zlgcan = ["zlgcan-driver-py"]
 
 [[package]]
+name = "spacepackets"
+version = "0.28.0"
+description = "Various CCSDS and ECSS packet implementations"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "spacepackets-0.28.0-py3-none-any.whl", hash = "sha256:a40ed13af1432b4a21cb49ea5b2c206a51e455e4f7b69242977aa12c71ee39ce"},
+    {file = "spacepackets-0.28.0.tar.gz", hash = "sha256:1a031921464e30700df6197577220014115544823cc363c0fd424d4f7008b730"},
+]
+
+[package.dependencies]
+crcmod = ">=1.7,<2.0"
+deprecation = ">=2.1,<3.0"
+
+[[package]]
 name = "textparser"
 version = "0.24.0"
 description = "Text parser."
@@ -523,4 +565,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "316741f9f5456226fc5eb6482bded292d03a1d945d816c6a4e05ca2db52f8ddb"
+content-hash = "e1870c361d2242e7b888589939c3927fdc6d96321f80a6c58c70fa4d80d6164f"
