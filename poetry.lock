@@ -187,7 +187,7 @@ version = "1.7"
 description = "CRC Generator"
 optional = false
 python-versions = "*"
-groups = ["main"]
+groups = ["cfdp"]
 files = [
     {file = "crcmod-1.7.tar.gz", hash = "sha256:dc7051a0db5f2bd48665a990d3ec1cc305a466a77358ca4492826f41f283601e"},
 ]
@@ -198,7 +198,7 @@ version = "2.1.0"
 description = "A library to handle automated deprecations"
 optional = false
 python-versions = "*"
-groups = ["main"]
+groups = ["cfdp"]
 files = [
     {file = "deprecation-2.1.0-py2.py3-none-any.whl", hash = "sha256:a10811591210e1fb0e768a8c25517cabeabcba6f0bf96564f8ff45189f90b14a"},
     {file = "deprecation-2.1.0.tar.gz", hash = "sha256:72b3bde64e5d778694b0cf68178aed03d15e15477116add3fb773e581f9518ff"},
@@ -324,7 +324,7 @@ version = "24.2"
 description = "Core utilities for Python packages"
 optional = false
 python-versions = ">=3.8"
-groups = ["main"]
+groups = ["main", "cfdp"]
 files = [
     {file = "packaging-24.2-py3-none-any.whl", hash = "sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759"},
     {file = "packaging-24.2.tar.gz", hash = "sha256:c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f"},
@@ -439,7 +439,7 @@ version = "0.28.0"
 description = "Various CCSDS and ECSS packet implementations"
 optional = false
 python-versions = ">=3.9"
-groups = ["main"]
+groups = ["cfdp"]
 files = [
     {file = "spacepackets-0.28.0-py3-none-any.whl", hash = "sha256:a40ed13af1432b4a21cb49ea5b2c206a51e455e4f7b69242977aa12c71ee39ce"},
     {file = "spacepackets-0.28.0.tar.gz", hash = "sha256:1a031921464e30700df6197577220014115544823cc363c0fd424d4f7008b730"},
@@ -565,4 +565,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12"
-content-hash = "e1870c361d2242e7b888589939c3927fdc6d96321f80a6c58c70fa4d80d6164f"
+content-hash = "e05b86a5c71f0fc8e4d6e8aa633c10c08837ac320fd40fc761e878ee2c84576f"
