@@ -6,8 +6,8 @@ from can_logger.can_interface import CANInterface
 from can_logger.database import CANMessageDatabase
 
 
-async def async_main(interface, fd_enabled, db_path):
-    can_interface = CANInterface(interface, fd_enabled)
+async def async_main(interface, db_path):
+    can_interface = CANInterface(interface)
     db_interface = CANMessageDatabase(db_path)
 
     await can_interface.connect()
@@ -42,19 +42,14 @@ async def async_main(interface, fd_enabled, db_path):
     help="CAN interface name (e.g., vcan0, can0).",
 )
 @click.option(
-    "--fd-enable/--no-fd-enable",
-    default=True,
-    help="Enable or disable CAN FD support.",
-)
-@click.option(
     "-d",
     "--db-path",
     type=str,
     default="can_messages.db",
     help="Path to SQLite database file for saving messages.",
 )
-def main(interface, fd_enable, db_path):
-    asyncio.run(async_main(interface, fd_enable, db_path))
+def main(interface, db_path):
+    asyncio.run(async_main(interface, db_path))
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ from can_logger.callbacks import AsyncCanMessageCallback
 
 
 class CANInterface:
-    def __init__(self, channel, fd_enabled):
+    def __init__(self, channel, fd_enabled: bool = True):
         self.channel: str = channel
         self.fd_enabled: bool = fd_enabled
 
