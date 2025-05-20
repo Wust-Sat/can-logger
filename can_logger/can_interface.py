@@ -1,22 +1,23 @@
 import asyncio
 import can
 from typing import Optional
+import sqlite3
+import click
 
 from can_logger.callbacks import AsyncCanMessageCallback, format_message
 
 
 class CANInterface:
-    def __init__(
-        self,
-        channel: str = "vcan0",
-        fd_enabled: bool = True,
-    ):
+    def __init__(self, channel, fd_enabled, db_path):
         self.channel: str = channel
         self.fd_enabled: bool = fd_enabled
+        self.db_path: str = db_path
 
         self.bus: Optional[can.interface.Bus] = None
         self.message_queue = asyncio.Queue()
         self.running: bool = False
+
+        self.db_connected: bool = False
 
         self.receive_callbacks: list[AsyncCanMessageCallback] = []
 
@@ -24,15 +25,57 @@ class CANInterface:
         try:
             self.bus = can.Bus(
                 channel=self.channel,
-                interface='socketcan',
-                fd=True,
+                interface="socketcan",
+                fd_en=self.fd_enabled,
             )
+
+            self.connect_db()
 
             self.running = True
             self.receive_task = asyncio.create_task(self._receive_loop())
 
         except Exception as e:
             raise
+
+    def connect_db(self) -> None:
+        try:
+            self.conn = sqlite3.connect(self.db_path)
+            self.cursor = self.conn.cursor()
+            self.cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS can_messages (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp REAL,
+                    arbitration_id TEXT,
+                    dlc INTEGER,
+                    data TEXT,
+                    is_fd INTEGER,
+                    is_error_frame INTEGER
+                )
+                """
+            )
+            self.conn.commit()
+            self.db_connected = True
+        except Exception as e:
+            self.db_connected = False
+
+    def add_message_to_db(self, message: can.Message) -> None:
+        # Save message to database
+        self.cursor.execute(
+            """
+            INSERT INTO can_messages (timestamp, arbitration_id, dlc, data, is_fd, is_error_frame)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (
+                message.timestamp,
+                f"{message.arbitration_id:03X}",
+                message.dlc,
+                " ".join(f"{b:02X}" for b in message.data),
+                int(message.is_fd),
+                int(message.is_error_frame),
+            ),
+        )
+        self.conn.commit()
 
     async def send_frame(self, can_id, data, is_fd=True):
         pass
@@ -105,15 +148,47 @@ class CANInterface:
             self.bus.shutdown()
             self.bus = None
 
+        # Close the database connection
+        if self.db_connected:
+            self.cursor.close()
+            self.conn.close()
+            self.db_connected = False
 
-async def main():
-    can_interface = CANInterface()
+@click.command()
+@click.option(
+    "-i",
+    "--interface",
+    required=True,
+    type=str,
+    help="CAN interface name (e.g., vcan0, can0).",
+)
+@click.option(
+    "--fd-enable/--no-fd-enable",
+    default=True,
+    help="Enable or disable CAN FD support.",
+)
+@click.option(
+    "-d",
+    "--db-path",
+    type=str,
+    default="can_messages.db",
+    help="Path to SQLite database file for saving messages.",
+)
+def main(interface, fd_enable, db_path):
+    asyncio.run(async_main(interface, fd_enable, db_path))
+
+async def async_main(interface, fd_enable, db_path):
+    can_interface = CANInterface(interface, fd_enable, db_path)
     await can_interface.connect()
 
     async def message_handler(message):
         print(format_message(message))
 
+    async def db_message_handler(message):
+        can_interface.add_message_to_db(message)
+
     can_interface.add_receive_callback(message_handler)
+    can_interface.add_receive_callback(db_message_handler)
 
     try:
         while can_interface.running:
@@ -124,5 +199,6 @@ async def main():
     finally:
         await can_interface.disconnect()
 
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
