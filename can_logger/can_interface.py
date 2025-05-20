@@ -154,6 +154,7 @@ class CANInterface:
             self.conn.close()
             self.db_connected = False
 
+
 @click.command()
 @click.option(
     "-i",
@@ -176,6 +177,7 @@ class CANInterface:
 )
 def main(interface, fd_enable, db_path):
     asyncio.run(async_main(interface, fd_enable, db_path))
+
 
 async def async_main(interface, fd_enable, db_path):
     can_interface = CANInterface(interface, fd_enable, db_path)

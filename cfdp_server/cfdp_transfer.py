@@ -34,7 +34,7 @@ if not SOURCE_FILE.exists():
         f.write("It has multiple lines.\n")
         f.write("CFDP will transfer this content segment by segment.\n")
         for i in range(10):
-             f.write(f"Line {i+4} with some more data to make it larger.\n")
+            f.write(f"Line {i+4} with some more data to make it larger.\n")
 
 # 2. File Handling and Checksum Calculation
 file_size = SOURCE_FILE.stat().st_size
@@ -69,14 +69,17 @@ metadata_params = MetadataParams(
     closure_requested=False,  # No closure request in unacknowledged mode
     checksum_type=ChecksumType.MODULAR,
     file_size=file_size,
-    source_file_name=str(SOURCE_FILE), # Send only the name usually
+    source_file_name=str(SOURCE_FILE),  # Send only the name usually
     dest_file_name=str("dupa.txt"),
     # options=None # No TLV options for this basic example
 )
 metadata_pdu = MetadataPdu(pdu_conf=pdu_conf, params=metadata_params)
 metadata_pdu_packed = metadata_pdu.pack()
 generated_pdus.append(("Metadata", metadata_pdu_packed))
-print(f"Metadata PDU Packed ({len(metadata_pdu_packed)} bytes): {metadata_pdu_packed.hex()}")
+print(
+    f"Metadata PDU Packed ({len(metadata_pdu_packed)} bytes):"
+    f" {metadata_pdu_packed.hex()}"
+)
 
 # 5. Generate File Data PDUs
 print("\nGenerating File Data PDUs...")
@@ -92,7 +95,7 @@ try:
             params = FileDataParams(
                 file_data=file_segment,
                 offset=offset,
-                )
+            )
             file_data_pdu = FileDataPdu(
                 pdu_conf=pdu_conf,
                 params=params,
@@ -101,7 +104,10 @@ try:
             file_data_pdu_packed = file_data_pdu.pack()
             segment_count += 1
             generated_pdus.append((f"FileData_{segment_count}", file_data_pdu_packed))
-            print(f"File Data PDU {segment_count} (Offset: {offset}, {len(file_data_pdu_packed)} bytes): {file_data_pdu_packed.hex()}")
+            print(
+                f"File Data PDU {segment_count} (Offset: {offset},"
+                f" {len(file_data_pdu_packed)} bytes): {file_data_pdu_packed.hex()}"
+            )
 
             offset += len(file_segment)
 
@@ -115,7 +121,7 @@ print(f"\nGenerated {segment_count} File Data PDUs.")
 print("\nGenerating EOF PDU...")
 eof_pdu = EofPdu(
     pdu_conf=pdu_conf,
-    file_checksum=checksum.to_bytes(4, byteorder="big"), # Checksum is 4 bytes
+    file_checksum=checksum.to_bytes(4, byteorder="big"),  # Checksum is 4 bytes
     file_size=file_size,
     condition_code=ConditionCode.NO_ERROR,
 )

@@ -19,6 +19,7 @@ black = "^25.1.0"
 pytest = "^8.3.5"
 cantools = "^40.2.1"
 click = "^8.1.8"
+poethepoet = "^0.34.0"
 
 [tool.poetry.group.cfdp.dependencies]
 spacepackets = "^0.28.0"
@@ -26,3 +27,12 @@ spacepackets = "^0.28.0"
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poe.env]
+CAN_FOLDER = "can_logger"
+CFDP_SERVER = "cfdp_server"
+ALL_FOLDERS = "${CAN_FOLDER} ${CFDP_SERVER}"
+
+[tool.poe.tasks]
+black = "black --preview --enable-unstable-feature string_processing ${ALL_FOLDERS}"
+black_check = "black --check --diff ${ALL_FOLDERS}"

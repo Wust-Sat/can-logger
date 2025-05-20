@@ -24,13 +24,9 @@ def reassemble_cfdp_file(
     """
     destination_file_path: pathlib.Path | None = None
     expected_file_size: int = 0
-    expected_checksum_type: ChecksumType = (
-        ChecksumType.MODULAR
-    )  # Default
+    expected_checksum_type: ChecksumType = ChecksumType.MODULAR  # Default
     sender_checksum_from_eof: bytes = b""
-    received_file_data: dict[
-        int, bytes
-    ] = {}  # To store segments: {offset: data_bytes}
+    received_file_data: dict[int, bytes] = {}  # To store segments: {offset: data_bytes}
 
     print("Starting CFDP PDU reassembly process...")
 
@@ -67,7 +63,8 @@ def reassemble_cfdp_file(
                 received_file_data[offset] = file_data_segment
             else:
                 print(
-                    f"    Warning: Duplicate File Data PDU for offset {offset} detected. Using first received."
+                    "    Warning: Duplicate File Data PDU for offset"
+                    f" {offset} detected. Using first received."
                 )
 
         elif isinstance(unpacked_pdu, EofPdu):
@@ -75,34 +72,24 @@ def reassemble_cfdp_file(
             sender_checksum_from_eof = unpacked_pdu.file_checksum
             eof_file_size = unpacked_pdu.file_size
             condition_code = unpacked_pdu.condition_code
-            print(
-                f"    Condition Code: {condition_code}"
-            )
-            print(
-                f"    Sender's Checksum: {sender_checksum_from_eof.hex()}"
-            )
+            print(f"    Condition Code: {condition_code}")
+            print(f"    Sender's Checksum: {sender_checksum_from_eof.hex()}")
             print(f"    File Size in EOF: {eof_file_size} bytes")
 
             if condition_code != ConditionCode.NO_ERROR:
-                print(
-                    f"    Warning: EOF PDU indicates an error: {condition_code}"
-                )
-            if (
-                expected_file_size > 0
-                and eof_file_size != expected_file_size
-            ):
+                print(f"    Warning: EOF PDU indicates an error: {condition_code}")
+            if expected_file_size > 0 and eof_file_size != expected_file_size:
                 print(
                     f"    Warning: File size in EOF ({eof_file_size}) "
                     f"does not match Metadata ({expected_file_size})"
                 )
         else:
-            print(
-                f"  Type: Unknown or unhandled PDU type: {type(unpacked_pdu)}"
-            )
+            print(f"  Type: Unknown or unhandled PDU type: {type(unpacked_pdu)}")
 
     if not destination_file_path:
         print(
-            "Error: Metadata PDU not processed or destination file path not set. Cannot reassemble."
+            "Error: Metadata PDU not processed or destination file path not set. Cannot"
+            " reassemble."
         )
         return False
 
@@ -112,11 +99,13 @@ def reassemble_cfdp_file(
     try:
         with open(destination_file_path, "wb") as f:
             if not received_file_data and expected_file_size == 0:
-                print("  No file data received, expected size is 0. Creating empty file.")
+                print(
+                    "  No file data received, expected size is 0. Creating empty file."
+                )
                 # File is already created empty by open("wb") and will be 0 bytes.
             elif not received_file_data and expected_file_size > 0:
-                 print("  Error: No file data received, but expected file size is > 0.")
-                 return False # Or handle as incomplete
+                print("  Error: No file data received, but expected file size is > 0.")
+                return False  # Or handle as incomplete
             else:
                 sorted_offsets = sorted(received_file_data.keys())
                 current_expected_offset = 0
@@ -124,8 +113,9 @@ def reassemble_cfdp_file(
                     segment_data = received_file_data[offset]
                     if offset < current_expected_offset:
                         print(
-                            f"  Warning: Overlapping segment at offset {offset}. "
-                            f"Expected {current_expected_offset}. Data might be overwritten."
+                            f"  Warning: Overlapping segment at offset {offset}."
+                            f" Expected {current_expected_offset}. Data might be"
+                            " overwritten."
                         )
                         # Adjust seek to avoid re-writing parts if segments truly overlap
                         # For simplicity, we just seek and write; last write for an overlapping
@@ -133,8 +123,9 @@ def reassemble_cfdp_file(
                     elif offset > current_expected_offset:
                         gap_size = offset - current_expected_offset
                         print(
-                            f"  Warning: Gap detected. Expected offset {current_expected_offset}, "
-                            f"got {offset}. Gap size: {gap_size} bytes."
+                            "  Warning: Gap detected. Expected offset"
+                            f" {current_expected_offset}, got {offset}. Gap size:"
+                            f" {gap_size} bytes."
                         )
                         # Per CFDP, unacknowledged mode doesn't fill gaps.
                         # The file will be "sparse" or have undefined content in the gap.
@@ -147,7 +138,8 @@ def reassemble_cfdp_file(
 
         actual_written_size = destination_file_path.stat().st_size
         print(
-            f"File {destination_file_path} assembled. Actual size on disk: {actual_written_size} bytes."
+            f"File {destination_file_path} assembled. Actual size on disk:"
+            f" {actual_written_size} bytes."
         )
 
         if actual_written_size != expected_file_size:
@@ -158,7 +150,10 @@ def reassemble_cfdp_file(
             # This could be due to gaps or overlaps not perfectly handled by simple sum
             # Or if the last segment didn't complete the file to expected_file_size
             if current_expected_offset < expected_file_size:
-                 print(f"  File appears truncated. Last write ended at {current_expected_offset}, expected {expected_file_size}.")
+                print(
+                    "  File appears truncated. Last write ended at"
+                    f" {current_expected_offset}, expected {expected_file_size}."
+                )
             # return False # Decide if this is fatal
 
     except IOError as e:
@@ -167,24 +162,28 @@ def reassemble_cfdp_file(
 
     # Checksum Verification
     if not sender_checksum_from_eof:
-        print(
-            "Warning: EOF PDU not processed or sender's checksum not available."
-        )
+        print("Warning: EOF PDU not processed or sender's checksum not available.")
         if actual_written_size == expected_file_size and expected_file_size > 0:
-             print("  File size matches metadata. Considering successful for now (no EOF checksum).")
-             return True
+            print(
+                "  File size matches metadata. Considering successful for now (no EOF"
+                " checksum)."
+            )
+            return True
         elif expected_file_size == 0 and actual_written_size == 0:
-             print("  Empty file expected and created. Considering successful (no EOF checksum).")
-             return True
+            print(
+                "  Empty file expected and created. Considering successful (no EOF"
+                " checksum)."
+            )
+            return True
         print("  Skipping checksum verification.")
         return False
-
 
     if expected_checksum_type == ChecksumType.MODULAR:
         print("\nVerifying modular checksum...")
         if not destination_file_path.exists():
             print(
-                f"Error: Reassembled file {destination_file_path} not found for checksum."
+                f"Error: Reassembled file {destination_file_path} not found for"
+                " checksum."
             )
             return False
         reassembled_checksum_val = calculate_cfdp_modular_checksum(
@@ -193,12 +192,8 @@ def reassemble_cfdp_file(
         reassembled_checksum_bytes = reassembled_checksum_val.to_bytes(
             4, byteorder="big"
         )
-        print(
-            f"  Reassembled File Checksum (hex): {reassembled_checksum_bytes.hex()}"
-        )
-        print(
-            f"  Sender's EOF Checksum (hex): {sender_checksum_from_eof.hex()}"
-        )
+        print(f"  Reassembled File Checksum (hex): {reassembled_checksum_bytes.hex()}")
+        print(f"  Sender's EOF Checksum (hex): {sender_checksum_from_eof.hex()}")
         if reassembled_checksum_bytes == sender_checksum_from_eof:
             print("Checksum verification successful!")
             return True
@@ -213,13 +208,14 @@ def reassemble_cfdp_file(
             return True
         else:
             print(
-                f"  File size ({actual_written_size}) does not match expected ({expected_file_size}), "
-                "though checksum is NULL."
+                f"  File size ({actual_written_size}) does not match expected"
+                f" ({expected_file_size}), though checksum is NULL."
             )
             return False
     else:
         print(
-            f"Warning: Unsupported checksum type ({expected_checksum_type.name}) for verification."
+            f"Warning: Unsupported checksum type ({expected_checksum_type.name}) for"
+            " verification."
         )
         return False  # Or True if skipping is acceptable
 
@@ -232,13 +228,31 @@ if __name__ == "__main__":
     # Example: Captured FULL output from cfdp_serialization.py
     # (Ensure SOURCE_FILE in cfdp_serialization.py is created with known content)
     test_pdu_list_hex = [
-        ("Metadata", "24002100000000070000000417112f746d702f7372632d66696c652e74787408647570612e747874"),
-        ("FileData_1", "3400f80000000000000000546869732069732074686520636f6e74656e74206f662074686520746573742066696c652e0a497420686173206d756c7469706c65206c696e65732e0a434644502077696c6c207472616e73666572207468697320636f6e74656e74207365676d656e74206279207365676d656e742e0a4c696e652034207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e652035207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e652036207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c"),
-        ("FileData_2", "3400f800000000000000f461726765722e0a4c696e652037207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e652038207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e652039207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203130207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203131207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e6520"),
-        ("FileData_3", "3400f800000000000001e83132207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203133207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203134207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203135207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203136207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e6520313720776974682073"),
-        ("FileData_4", "3400f800000000000002dc6f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203138207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203139207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203230207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203231207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203232207769746820736f6d65206d6f726520"),
-        ("FileData_5", "34004b00000000000003d06461746120746f206d616b65206974206c61726765722e0a4c696e65203233207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a"),
-        ("EOF", "24000a000000000400889c141c00000417"), # Checksum from script's EOF
+        (
+            "Metadata",
+            "24002100000000070000000417112f746d702f7372632d66696c652e74787408647570612e747874",
+        ),
+        (
+            "FileData_1",
+            "3400f80000000000000000546869732069732074686520636f6e74656e74206f662074686520746573742066696c652e0a497420686173206d756c7469706c65206c696e65732e0a434644502077696c6c207472616e73666572207468697320636f6e74656e74207365676d656e74206279207365676d656e742e0a4c696e652034207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e652035207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e652036207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c",
+        ),
+        (
+            "FileData_2",
+            "3400f800000000000000f461726765722e0a4c696e652037207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e652038207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e652039207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203130207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203131207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e6520",
+        ),
+        (
+            "FileData_3",
+            "3400f800000000000001e83132207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203133207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203134207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203135207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203136207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e6520313720776974682073",
+        ),
+        (
+            "FileData_4",
+            "3400f800000000000002dc6f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203138207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203139207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203230207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203231207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a4c696e65203232207769746820736f6d65206d6f726520",
+        ),
+        (
+            "FileData_5",
+            "34004b00000000000003d06461746120746f206d616b65206974206c61726765722e0a4c696e65203233207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a",
+        ),
+        ("EOF", "24000a000000000400889c141c00000417"),  # Checksum from script's EOF
     ]
 
     # The prompt's EOF had checksum 889c141c. If you use that EOF with the file data above, checksum will fail.
@@ -254,23 +268,27 @@ if __name__ == "__main__":
             exit(1)
 
     output_directory = pathlib.Path("/tmp")
-    success = reassemble_cfdp_file(
-        test_pdu_list_bytes, output_dir=output_directory
-    )
+    success = reassemble_cfdp_file(test_pdu_list_bytes, output_dir=output_directory)
 
     if success:
         print(f"\nFile reassembly successful. Output in {output_directory}")
         # Compare with the original source file used by cfdp_serialization.py
         original_file = pathlib.Path("/tmp/src-file.txt")
-        reassembled_file = output_directory / "dupa.txt" # From metadata
+        reassembled_file = output_directory / "dupa.txt"  # From metadata
 
         if original_file.exists() and reassembled_file.exists():
             print(f"Original file size: {original_file.stat().st_size}")
             print(f"Reassembled file size: {reassembled_file.stat().st_size}")
             if original_file.read_bytes() == reassembled_file.read_bytes():
-                print("SUCCESS: Reassembled file content MATCHES the original source file.")
+                print(
+                    "SUCCESS: Reassembled file content MATCHES the original source"
+                    " file."
+                )
             else:
-                print("FAILURE: Reassembled file content does NOT match the original source file.")
+                print(
+                    "FAILURE: Reassembled file content does NOT match the original"
+                    " source file."
+                )
         else:
             print("Could not compare files (original or reassembled file missing).")
     else:

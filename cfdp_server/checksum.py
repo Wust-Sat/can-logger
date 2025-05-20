@@ -1,5 +1,6 @@
 import pathlib
-import struct # Needed for packing bytes for checksum calculation
+import struct  # Needed for packing bytes for checksum calculation
+
 
 def calculate_cfdp_modular_checksum(file_path: pathlib.Path) -> int:
     """
@@ -23,7 +24,7 @@ def calculate_cfdp_modular_checksum(file_path: pathlib.Path) -> int:
                 bytes_read_total += len(chunk)
 
                 if not chunk:
-                    break # End of file
+                    break  # End of file
 
                 if len(chunk) == 4:
                     # Unpack 4 bytes into a big-endian unsigned integer
@@ -31,7 +32,7 @@ def calculate_cfdp_modular_checksum(file_path: pathlib.Path) -> int:
                     checksum += word
                 else:
                     # Handle padding for the last partial chunk
-                    padded_chunk = chunk + bytes(4 - len(chunk)) # Pad with \x00
+                    padded_chunk = chunk + bytes(4 - len(chunk))  # Pad with \x00
                     word = struct.unpack(">I", padded_chunk)[0]
                     checksum += word
                     # Since this is the last chunk, break the loop
@@ -42,7 +43,7 @@ def calculate_cfdp_modular_checksum(file_path: pathlib.Path) -> int:
 
     except IOError as e:
         print(f"Error reading file {file_path} for checksum: {e}")
-        raise # Re-raise the exception
+        raise  # Re-raise the exception
 
     # Final modulo operation (though often redundant due to loop)
     return checksum & 0xFFFFFFFF

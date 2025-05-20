@@ -53,7 +53,8 @@ class CanSniffer:
             )
             print(f"System error: {e}", file=sys.stderr)
             print(
-                "Ensure the interface exists and is up (e.g., 'sudo ip link set vcan0 up').",
+                "Ensure the interface exists and is up (e.g., 'sudo ip link set vcan0"
+                " up').",
                 file=sys.stderr,
             )
             self._running = False
