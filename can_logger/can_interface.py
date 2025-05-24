@@ -52,7 +52,9 @@ class CANInterface:
 
         while self.running:
             try:
-                message: can.Message = await loop.run_in_executor(None, self.bus.recv, 0.1)
+                message: can.Message = await loop.run_in_executor(
+                    None, self.bus.recv, 0.1
+                )
                 if message is not None:
                     await self.message_queue.put(message)
 

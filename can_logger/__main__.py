@@ -11,13 +11,13 @@ async def async_main(interface, db_path):
     db_interface = CANMessageDatabase(db_path)
 
     await can_interface.connect()
-    db_interface.connect()
+    await db_interface.connect()
 
     async def message_printer(message):
         print(format_message(message))
 
-    def db_message_handler(message):
-        db_interface.add_message(message)
+    async def db_message_handler(message):
+        await db_interface.add_message(message)
 
     can_interface.add_receive_callback(message_printer)
     can_interface.add_receive_callback(db_message_handler)
@@ -30,7 +30,7 @@ async def async_main(interface, db_path):
         print("Interrupted by user")
     finally:
         await can_interface.disconnect()
-        db_interface.disconnect()
+        await db_interface.disconnect()
 
 
 @click.command()

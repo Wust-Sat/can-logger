@@ -1,5 +1,5 @@
 import can
-import sqlite3
+import aiosqlite
 from pathlib import Path
 
 
@@ -10,11 +10,11 @@ class CANMessageDatabase:
         self.conn = None
         self.cursor = None
 
-    def connect(self) -> None:
+    async def connect(self) -> None:
         try:
-            self.conn = sqlite3.connect(self.db_path)
-            self.cursor = self.conn.cursor()
-            self.cursor.execute(
+            self.conn = await aiosqlite.connect(self.db_path)
+            self.cursor = await self.conn.cursor()
+            await self.cursor.execute(
                 """
                 CREATE TABLE IF NOT EXISTS can_messages (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,17 +27,17 @@ class CANMessageDatabase:
                 )
                 """
             )
-            self.conn.commit()
+            await self.conn.commit()
             self.db_connected = True
         except Exception as e:
             self.db_connected = False
 
-    def add_message(self, message: can.Message) -> None:
+    async def add_message(self, message: can.Message) -> None:
         if not self.db_connected:
             raise RuntimeError("First connect to database.")
 
         # Save message to database
-        self.cursor.execute(
+        await self.cursor.execute(
             """
             INSERT INTO can_messages (timestamp, arbitration_id, dlc, data, is_fd, is_error_frame)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -51,10 +51,10 @@ class CANMessageDatabase:
                 int(message.is_error_frame),
             ),
         )
-        self.conn.commit()
+        await self.conn.commit()
 
-    def disconnect(self) -> None:
+    async def disconnect(self) -> None:
         if self.db_connected:
-            self.cursor.close()
-            self.conn.close()
+            await self.cursor.close()
+            await self.conn.close()
             self.db_connected = False

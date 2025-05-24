@@ -20,6 +20,7 @@ pytest = "^8.3.5"
 cantools = "^40.2.1"
 click = "^8.1.8"
 poethepoet = "^0.34.0"
+aiosqlite = "^0.21.0"
 
 [tool.poetry.group.cfdp.dependencies]
 spacepackets = "^0.28.0"
