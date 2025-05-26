@@ -1,5 +1,6 @@
 import can
 import aiosqlite
+from aiosqlite import Connection, Cursor
 from pathlib import Path
 
 
@@ -7,8 +8,8 @@ class CANMessageDatabase:
     def __init__(self, db_path: str | Path):
         self.db_path: Path = Path(db_path)
         self.db_connected: bool | None = None
-        self.conn = None
-        self.cursor = None
+        self.conn: Connection = None
+        self.cursor: Cursor = None
 
     async def connect(self) -> None:
         try:
