@@ -3,6 +3,7 @@ name = "can-logger"
 version = "0.1.0"
 description = ""
 authors = [
+    {name = "Kamil Witoń", email = "275477@student.pwr.edu.pl"},
     {name = "Juliusz Tarnowski",email = "juliusz.stanislaw.tarnowski@gmail.com"}
 ]
 license = {text = "MIT"}
@@ -12,15 +13,20 @@ requires-python = ">=3.12"
 packages = [
   { include = "can_logger" },
   { include = "cfdp_server" },
+  { include = "components_life_guard" },
 ]
 
 [tool.poetry.dependencies]
-black = "^25.1.0"
-pytest = "^8.3.5"
 cantools = "^40.2.1"
 click = "^8.1.8"
-poethepoet = "^0.34.0"
+pydantic = "^2.11.5"
 aiosqlite = "^0.21.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
+pytest = "^8.3.5"
+poethepoet = "^0.34.0"
+isort = "^6.0.1"
 
 [tool.poetry.group.cfdp.dependencies]
 spacepackets = "^0.28.0"
@@ -32,7 +38,8 @@ build-backend = "poetry.core.masonry.api"
 [tool.poe.env]
 CAN_FOLDER = "can_logger"
 CFDP_SERVER = "cfdp_server"
-ALL_FOLDERS = "${CAN_FOLDER} ${CFDP_SERVER}"
+LIFE_GUARD = "components_life_guard"
+ALL_FOLDERS = "${CAN_FOLDER} ${CFDP_SERVER} {LIFE_GUARD}"
 
 [tool.poe.tasks]
 black = "black --preview --enable-unstable-feature string_processing ${ALL_FOLDERS}"
