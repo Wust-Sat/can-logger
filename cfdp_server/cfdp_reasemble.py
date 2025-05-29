@@ -3,8 +3,7 @@ import pathlib
 
 from spacepackets.cfdp.defs import ChecksumType, ConditionCode
 from spacepackets.cfdp.pdu import PduFactory  # For parsing generic PDUs
-from spacepackets.cfdp.pdu import (EofPdu, FileDataPdu,  # For type checking
-                                   MetadataPdu)
+from spacepackets.cfdp.pdu import EofPdu, FileDataPdu, MetadataPdu  # For type checking
 
 from cfdp_server.checksum import calculate_cfdp_modular_checksum
 

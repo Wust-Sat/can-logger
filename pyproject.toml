@@ -39,7 +39,7 @@ build-backend = "poetry.core.masonry.api"
 CAN_FOLDER = "can_logger"
 CFDP_SERVER = "cfdp_server"
 LIFE_GUARD = "components_life_guard"
-ALL_FOLDERS = "${CAN_FOLDER} ${CFDP_SERVER} {LIFE_GUARD}"
+ALL_FOLDERS = "${CAN_FOLDER} ${CFDP_SERVER} ${LIFE_GUARD}"
 
 [tool.poe.tasks]
 black = "black --preview --enable-unstable-feature string_processing ${ALL_FOLDERS}"

@@ -5,14 +5,30 @@ import click
 from can_logger.callbacks import format_message
 from can_logger.can_interface import CANInterface
 from can_logger.database import CANMessageDatabase
+from components_life_guard.life_center import Device, LifeGuard
+from components_life_guard.config import config
+
+
+def setup_life_guard() -> LifeGuard:
+    lg = LifeGuard()
+    for key, value in config.items():
+        lg.add_device(Device(node_id=value["node_id"], name=key))
+    return lg
 
 
 async def async_main(interface, db_path):
     can_interface = CANInterface(interface)
     db_interface = CANMessageDatabase(db_path)
+    life_guard: LifeGuard = setup_life_guard()
 
     await can_interface.connect()
     await db_interface.connect()
+    await life_guard.start()
+
+    async def life_guard_handler(message):
+        nonlocal life_guard
+        # print(life_guard.monitor(message))
+        life_guard.monitor(message)
 
     async def message_printer(message):
         print(format_message(message))
@@ -22,6 +38,7 @@ async def async_main(interface, db_path):
 
     can_interface.add_receive_callback(message_printer)
     can_interface.add_receive_callback(db_message_handler)
+    can_interface.add_receive_callback(life_guard_handler)
 
     try:
         while can_interface.running:
