@@ -1,12 +1,10 @@
 # cfdp_reassembly.py
 import pathlib
-from spacepackets.cfdp.pdu import PduFactory  # For parsing generic PDUs
-from spacepackets.cfdp.pdu import (
-    MetadataPdu,
-    FileDataPdu,
-    EofPdu,
-)  # For type checking
+
 from spacepackets.cfdp.defs import ChecksumType, ConditionCode
+from spacepackets.cfdp.pdu import PduFactory  # For parsing generic PDUs
+from spacepackets.cfdp.pdu import (EofPdu, FileDataPdu,  # For type checking
+                                   MetadataPdu)
 
 from cfdp_server.checksum import calculate_cfdp_modular_checksum
 

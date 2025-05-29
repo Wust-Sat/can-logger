@@ -3,6 +3,8 @@ import aiosqlite
 from aiosqlite import Connection, Cursor
 from pathlib import Path
 
+import can
+
 
 class CANMessageDatabase:
     def __init__(self, db_path: str | Path):

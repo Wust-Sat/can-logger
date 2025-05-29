@@ -1,8 +1,9 @@
+import signal
+import sqlite3
+import sys
+
 import can
 import click
-import signal
-import sys
-import sqlite3
 
 
 class CanSniffer:

@@ -1,6 +1,7 @@
 import asyncio
+from typing import Iterable, Optional
+
 import can
-from typing import Optional, Iterable
 
 from can_logger.callbacks import AsyncCanMessageCallback
 

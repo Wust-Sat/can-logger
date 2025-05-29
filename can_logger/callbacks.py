@@ -1,5 +1,6 @@
+from typing import Awaitable, Callable
+
 import can
-from typing import Callable, Awaitable
 
 AsyncCanMessageCallback = Callable[[can.Message], Awaitable[None]]
 

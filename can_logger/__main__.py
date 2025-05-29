@@ -1,4 +1,5 @@
 import asyncio
+
 import click
 
 from can_logger.callbacks import format_message

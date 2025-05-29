@@ -1,18 +1,11 @@
 import pathlib
+
+from spacepackets.cfdp import ChecksumType, PduConfig, TransmissionMode
 from spacepackets.cfdp.conf import ByteFieldU8
-from spacepackets.cfdp import (
-    PduConfig,
-    TransmissionMode,
-    ChecksumType,
-)
-from spacepackets.cfdp.pdu import (
-    MetadataPdu,
-    FileDataPdu,
-    EofPdu,
-    MetadataParams,
-    FileDataParams,
-)
-from spacepackets.cfdp.defs import ConditionCode, ChecksumType
+from spacepackets.cfdp.defs import ChecksumType, ConditionCode
+from spacepackets.cfdp.pdu import (EofPdu, FileDataParams, FileDataPdu,
+                                   MetadataParams, MetadataPdu)
+
 from cfdp_server.checksum import calculate_cfdp_modular_checksum
 
 # 1. Configuration
