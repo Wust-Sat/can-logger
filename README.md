@@ -53,10 +53,10 @@ python3 -m can_logger --interface vcan0
 To browse and filter saved messages, use:
 
 ```shell
-python3 -m can_logger.database_tools --mode all
-python3 -m can_logger.database_tools --mode last -n 20
-python3 -m can_logger.database_tools --mode id --arbitration-id 123
-python3 -m can_logger.database_tools --mode date --date 2024-06-03
+python3 -m can_logger.database_tools -d can_messages.db --mode all
+python3 -m can_logger.database_tools -d can_messages.db --mode last -n 20
+python3 -m can_logger.database_tools -d can_messages.db --mode id --arbitration-id 123
+python3 -m can_logger.database_tools -d can_messages.db --mode date --date 2024-06-03
 ```
 
 ## Features

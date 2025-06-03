@@ -1,6 +1,6 @@
 import click
 import re
-from database_tools.database_interface import DatabaseInterface
+from can_logger.database_tools.database_interface import DatabaseInterface
 
 
 def print_messages(messages: list) -> None:
@@ -14,7 +14,7 @@ def print_messages(messages: list) -> None:
     "-d",
     "--db-path",
     type=str,
-    default="../can_messages.db",
+    default="can_messages.db",
     help="Path to SQLite database file for saving messages.",
 )
 @click.option(
