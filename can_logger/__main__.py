@@ -7,7 +7,14 @@ from can_logger.can_interface import CANInterface
 from can_logger.database import CANMessageDatabase
 from components_life_guard.life_center import Device, LifeGuard
 from components_life_guard.config import config
+from components_life_guard.mqtt_interface import MQTTConfig, LifeGuardMQTT
 
+def setup_life_guard_mqtt() -> LifeGuard:
+    configmqtt = MQTTConfig(broker_host="localhost")
+    lg = LifeGuardMQTT(configmqtt)
+    for key, value in config.items():
+        lg.add_device(Device(node_id=value["node_id"], name=key))
+    return lg
 
 def setup_life_guard() -> LifeGuard:
     lg = LifeGuard()
@@ -19,7 +26,9 @@ def setup_life_guard() -> LifeGuard:
 async def async_main(interface, db_path):
     can_interface = CANInterface(interface)
     db_interface = CANMessageDatabase(db_path)
-    life_guard: LifeGuard = setup_life_guard()
+    # life_guard: LifeGuard = setup_life_guard()
+    life_guard: LifeGuard = setup_life_guard_mqtt()
+
 
     await can_interface.connect()
     await db_interface.connect()

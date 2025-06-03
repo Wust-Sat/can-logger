@@ -1,7 +1,7 @@
 import asyncio
 
-from components_life_guard.life_center import Dummy
-from components_life_guard.config import config
+from life_center import Dummy
+from config import config
 
 
 # Usage
