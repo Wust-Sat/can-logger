@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = [
     {name = "Juliusz Tarnowski",email = "juliusz.stanislaw.tarnowski@gmail.com"}
+    [name = "Adam Matusiak", email = "adammatusiak@icloude.com"}
 ]
 license = {text = "MIT"}
 readme = "README.md"

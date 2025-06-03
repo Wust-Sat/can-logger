@@ -19,7 +19,7 @@ def print_messages(messages: list) -> None:
 )
 @click.option(
     "--mode",
-    type=click.Choice(["all", "last", "arbitration", "date"], case_sensitive=False),
+    type=click.Choice(["all", "last", "id", "date"], case_sensitive=False),
     default="all",
     help="Choose operation mode.",
 )
@@ -34,7 +34,7 @@ def print_messages(messages: list) -> None:
     "--arbitration-id",
     type=str,
     default=None,
-    help="Arbitration ID (for 'arbitration' mode).",
+    help="Arbitration ID (for 'id' mode).",
 )
 @click.option(
     "-d",
@@ -65,7 +65,7 @@ def main(db_path, mode, n, arbitration_id, date, hour, minute):
         print_messages(db_interface.get_all_messages())
     elif mode == "last":
         print_messages(db_interface.get_last_n_messages(n))
-    elif mode == "arbitration":
+    elif mode == "id":
         print_messages(db_interface.get_messages_by_arbitration_id(arbitration_id))
     elif mode == "date":
         if not date:
