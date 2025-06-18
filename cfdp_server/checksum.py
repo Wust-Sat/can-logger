@@ -32,7 +32,9 @@ def calculate_cfdp_modular_checksum(file_path: pathlib.Path) -> int:
                     checksum += word
                 else:
                     # Handle padding for the last partial chunk
-                    padded_chunk = chunk + bytes(4 - len(chunk))  # Pad with \x00
+                    padded_chunk = chunk + bytes(
+                        4 - len(chunk)
+                    )  # Pad with \x00
                     word = struct.unpack(">I", padded_chunk)[0]
                     checksum += word
                     # Since this is the last chunk, break the loop

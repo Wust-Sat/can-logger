@@ -1,5 +1,7 @@
-import click
 import re
+
+import click
+
 from can_logger.database_tools.database_interface import DatabaseInterface
 
 
@@ -66,7 +68,9 @@ def main(db_path, mode, n, arbitration_id, date, hour, minute):
     elif mode == "last":
         print_messages(db_interface.get_last_n_messages(n))
     elif mode == "id":
-        print_messages(db_interface.get_messages_by_arbitration_id(arbitration_id))
+        print_messages(
+            db_interface.get_messages_by_arbitration_id(arbitration_id)
+        )
     elif mode == "date":
         if not date:
             print("You must provide a date for 'date' mode.")

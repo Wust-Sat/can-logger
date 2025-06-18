@@ -3,12 +3,11 @@ name = "can-logger"
 version = "0.3.0"
 description = ""
 authors = [
-    { name = "Juliusz Tarnowski", email = "juliusz.stanislaw.tarnowski@gmail.com" },
     { name = "Adam Matusiak", email = "adammatusiak@icloude.com" }
 ]
-license = {text = "MIT"}
+license = { text = "MIT" }
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<4.0"
 
 [tool.poetry]
 packages = [
@@ -19,10 +18,17 @@ packages = [
 [tool.poetry.dependencies]
 black = "^25.1.0"
 pytest = "^8.3.5"
+pytest-asyncio = "^0.23.6"
+pytest-mock = "^3.14.0"
 cantools = "^40.2.1"
 click = "^8.1.8"
 poethepoet = "^0.34.0"
 aiosqlite = "^0.21.0"
+
+[tool.poetry.group.dev.dependencies]
+poetry = "^2.1.2"
+ruff = "^0.11.11"
+isort = "^6.0.1"
 
 [tool.poetry.group.cfdp.dependencies]
 spacepackets = "^0.28.0"
@@ -39,3 +45,36 @@ ALL_FOLDERS = "${CAN_FOLDER} ${CFDP_SERVER}"
 [tool.poe.tasks]
 black = "black --preview --enable-unstable-feature string_processing ${ALL_FOLDERS}"
 black_check = "black --check --diff ${ALL_FOLDERS}"
+
+isort = "isort ${ALL_FOLDERS}"
+isort_check = "isort --check ${ALL_FOLDERS}"
+
+ruff = "ruff check ${ALL_FOLDERS}"
+ruff_fix = "ruff check --fix ${ALL_FOLDERS}"
+
+unit_test = "env PYTHONPATH= pytest -vs ."
+
+format = ["black", "isort", "ruff_fix"]
+format_check = ["black_check", "isort_check", "ruff"]
+
+[tool.black]
+line-length = 79
+
+[tool.isort]
+profile = "black"
+line_length = 79
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "C4", "SIM"]
+ignore = ["I", "E501"]
+
+[tool.pytest.ini_options]
+markers = [
+    "timeout: limit test duration"
+]
+addopts = """
+    -p no:launch_testing_ros_pytest_entrypoint
+    -p no:launch_testing
+"""
+
+

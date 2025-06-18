@@ -1,24 +1,28 @@
 import pathlib
-from spacepackets.cfdp.conf import ByteFieldU8
+
 from spacepackets.cfdp import (
+    ChecksumType,
     PduConfig,
     TransmissionMode,
-    ChecksumType,
 )
+from spacepackets.cfdp.conf import ByteFieldU8
+from spacepackets.cfdp.defs import ConditionCode
 from spacepackets.cfdp.pdu import (
-    MetadataPdu,
-    FileDataPdu,
     EofPdu,
-    MetadataParams,
     FileDataParams,
+    FileDataPdu,
+    MetadataParams,
+    MetadataPdu,
 )
-from spacepackets.cfdp.defs import ConditionCode, ChecksumType
+
 from cfdp_server.checksum import calculate_cfdp_modular_checksum
 
 # 1. Configuration
 SOURCE_ENTITY_ID_BYTES = b"\x00\x01"  # Example Source ID 1
 DESTINATION_ENTITY_ID_BYTES = b"\x00\x02"  # Example Destination ID 2
-TRANSACTION_SEQ_NUM_BYTES = b"\x00\x00\x00\x01"  # Example Transaction Sequence Number 1
+TRANSACTION_SEQ_NUM_BYTES = (
+    b"\x00\x00\x00\x01"  # Example Transaction Sequence Number 1
+)
 SOURCE_FILE = pathlib.Path("/tmp/src-file.txt")
 DESTINATION_FILE = pathlib.Path("dupa.txt")
 FILE_SEGMENT_SIZE = 256 - 12
@@ -103,7 +107,9 @@ try:
             )
             file_data_pdu_packed = file_data_pdu.pack()
             segment_count += 1
-            generated_pdus.append((f"FileData_{segment_count}", file_data_pdu_packed))
+            generated_pdus.append(
+                (f"FileData_{segment_count}", file_data_pdu_packed)
+            )
             print(
                 f"File Data PDU {segment_count} (Offset: {offset},"
                 f" {len(file_data_pdu_packed)} bytes): {file_data_pdu_packed.hex()}"

@@ -1,7 +1,8 @@
-import can
-import aiosqlite
-from aiosqlite import Connection, Cursor
 from pathlib import Path
+
+import aiosqlite
+import can
+from aiosqlite import Connection, Cursor
 
 
 class CANMessageDatabase:
@@ -30,7 +31,7 @@ class CANMessageDatabase:
             )
             await self.conn.commit()
             self.db_connected = True
-        except Exception as e:
+        except Exception:
             self.db_connected = False
 
     async def add_message(self, message: can.Message) -> None:

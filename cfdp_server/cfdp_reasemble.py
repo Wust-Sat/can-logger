@@ -1,12 +1,13 @@
 # cfdp_reassembly.py
 import pathlib
-from spacepackets.cfdp.pdu import PduFactory  # For parsing generic PDUs
-from spacepackets.cfdp.pdu import (
-    MetadataPdu,
-    FileDataPdu,
-    EofPdu,
-)  # For type checking
+
 from spacepackets.cfdp.defs import ChecksumType, ConditionCode
+from spacepackets.cfdp.pdu import PduFactory  # For parsing generic PDUs
+from spacepackets.cfdp.pdu import (  # For type checking
+    EofPdu,
+    FileDataPdu,
+    MetadataPdu,
+)
 
 from cfdp_server.checksum import calculate_cfdp_modular_checksum
 
@@ -26,7 +27,9 @@ def reassemble_cfdp_file(
     expected_file_size: int = 0
     expected_checksum_type: ChecksumType = ChecksumType.MODULAR  # Default
     sender_checksum_from_eof: bytes = b""
-    received_file_data: dict[int, bytes] = {}  # To store segments: {offset: data_bytes}
+    received_file_data: dict[int, bytes] = (
+        {}
+    )  # To store segments: {offset: data_bytes}
 
     print("Starting CFDP PDU reassembly process...")
 
@@ -77,14 +80,18 @@ def reassemble_cfdp_file(
             print(f"    File Size in EOF: {eof_file_size} bytes")
 
             if condition_code != ConditionCode.NO_ERROR:
-                print(f"    Warning: EOF PDU indicates an error: {condition_code}")
+                print(
+                    f"    Warning: EOF PDU indicates an error: {condition_code}"
+                )
             if expected_file_size > 0 and eof_file_size != expected_file_size:
                 print(
                     f"    Warning: File size in EOF ({eof_file_size}) "
                     f"does not match Metadata ({expected_file_size})"
                 )
         else:
-            print(f"  Type: Unknown or unhandled PDU type: {type(unpacked_pdu)}")
+            print(
+                f"  Type: Unknown or unhandled PDU type: {type(unpacked_pdu)}"
+            )
 
     if not destination_file_path:
         print(
@@ -104,7 +111,9 @@ def reassemble_cfdp_file(
                 )
                 # File is already created empty by open("wb") and will be 0 bytes.
             elif not received_file_data and expected_file_size > 0:
-                print("  Error: No file data received, but expected file size is > 0.")
+                print(
+                    "  Error: No file data received, but expected file size is > 0."
+                )
                 return False  # Or handle as incomplete
             else:
                 sorted_offsets = sorted(received_file_data.keys())
@@ -162,8 +171,13 @@ def reassemble_cfdp_file(
 
     # Checksum Verification
     if not sender_checksum_from_eof:
-        print("Warning: EOF PDU not processed or sender's checksum not available.")
-        if actual_written_size == expected_file_size and expected_file_size > 0:
+        print(
+            "Warning: EOF PDU not processed or sender's checksum not available."
+        )
+        if (
+            actual_written_size == expected_file_size
+            and expected_file_size > 0
+        ):
             print(
                 "  File size matches metadata. Considering successful for now (no EOF"
                 " checksum)."
@@ -192,8 +206,12 @@ def reassemble_cfdp_file(
         reassembled_checksum_bytes = reassembled_checksum_val.to_bytes(
             4, byteorder="big"
         )
-        print(f"  Reassembled File Checksum (hex): {reassembled_checksum_bytes.hex()}")
-        print(f"  Sender's EOF Checksum (hex): {sender_checksum_from_eof.hex()}")
+        print(
+            f"  Reassembled File Checksum (hex): {reassembled_checksum_bytes.hex()}"
+        )
+        print(
+            f"  Sender's EOF Checksum (hex): {sender_checksum_from_eof.hex()}"
+        )
         if reassembled_checksum_bytes == sender_checksum_from_eof:
             print("Checksum verification successful!")
             return True
@@ -252,7 +270,10 @@ if __name__ == "__main__":
             "FileData_5",
             "34004b00000000000003d06461746120746f206d616b65206974206c61726765722e0a4c696e65203233207769746820736f6d65206d6f7265206461746120746f206d616b65206974206c61726765722e0a",
         ),
-        ("EOF", "24000a000000000400889c141c00000417"),  # Checksum from script's EOF
+        (
+            "EOF",
+            "24000a000000000400889c141c00000417",
+        ),  # Checksum from script's EOF
     ]
 
     # The prompt's EOF had checksum 889c141c. If you use that EOF with the file data above, checksum will fail.
@@ -268,7 +289,9 @@ if __name__ == "__main__":
             exit(1)
 
     output_directory = pathlib.Path("/tmp")
-    success = reassemble_cfdp_file(test_pdu_list_bytes, output_dir=output_directory)
+    success = reassemble_cfdp_file(
+        test_pdu_list_bytes, output_dir=output_directory
+    )
 
     if success:
         print(f"\nFile reassembly successful. Output in {output_directory}")
@@ -290,6 +313,8 @@ if __name__ == "__main__":
                     " source file."
                 )
         else:
-            print("Could not compare files (original or reassembled file missing).")
+            print(
+                "Could not compare files (original or reassembled file missing)."
+            )
     else:
         print("\nFile reassembly failed.")

@@ -1,6 +1,7 @@
 import asyncio
+from typing import Iterable, Optional
+
 import can
-from typing import Optional, Iterable
 
 from can_logger.callbacks import AsyncCanMessageCallback
 
@@ -27,7 +28,7 @@ class CANInterface:
             self.running = True
             self.receive_task = asyncio.create_task(self._receive_loop())
 
-        except Exception as e:
+        except Exception:
             self.running = False
 
     async def send_frame(self, can_id, data, is_fd=True):
@@ -37,7 +38,9 @@ class CANInterface:
         try:
             message: can.Message
             if timeout is not None:
-                message = await asyncio.wait_for(self.message_queue.get(), timeout)
+                message = await asyncio.wait_for(
+                    self.message_queue.get(), timeout
+                )
             else:
                 message = await self.message_queue.get()
 
@@ -61,14 +64,14 @@ class CANInterface:
                     for callback in self.receive_callbacks:
                         try:
                             asyncio.create_task(callback(message))
-                        except Exception as e:
+                        except Exception:
                             # await logger.error(f"Error in receive callback: {str(e)}")
-                            pass
+                            raise
 
             except asyncio.CancelledError:
                 break
 
-            except Exception as e:
+            except Exception:
                 # await logger.error(f"Error in receive loop: {str(e)}")
                 await asyncio.sleep(0.1)
 
@@ -96,8 +99,7 @@ class CANInterface:
             try:
                 await self.receive_task
             except asyncio.CancelledError:
-                pass
-            self.receive_task = None
+                self.receive_task = None
 
         # Close the bus
         if self.bus is not None:

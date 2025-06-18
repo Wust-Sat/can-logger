@@ -43,9 +43,12 @@ async def test_connect_sets_bus_and_running(can_interface):
 
 
 @pytest.mark.asyncio
-async def test_connect_sets_bus_connected_false_on_exception(mocker, can_interface):
+async def test_connect_sets_bus_connected_false_on_exception(
+    mocker, can_interface
+):
     mocker.patch(
-        "can_logger.can_interface.can.Bus", side_effect=RuntimeError("Bus error")
+        "can_logger.can_interface.can.Bus",
+        side_effect=RuntimeError("Bus error"),
     )
 
     await can_interface.connect()

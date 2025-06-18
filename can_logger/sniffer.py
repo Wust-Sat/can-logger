@@ -1,8 +1,9 @@
+import signal
+import sqlite3
+import sys
+
 import can
 import click
-import signal
-import sys
-import sqlite3
 
 
 class CanSniffer:
@@ -10,7 +11,9 @@ class CanSniffer:
     A class to sniff messages on a CAN bus using python-can.
     """
 
-    def __init__(self, interface, bustype="socketcan", bitrate=None, db_path=None):
+    def __init__(
+        self, interface, bustype="socketcan", bitrate=None, db_path=None
+    ):
         """
         Initializes the CanSniffer.
 
@@ -32,14 +35,16 @@ class CanSniffer:
         arbitration_id_str = f"{msg.arbitration_id:03X}"
         data_str = " ".join(f"{b:02X}" for b in msg.data)
         # Example: vcan0  123   [8]  DE AD BE EF 00 11 22 33
-        return (
-            f"  {self.interface:<5}  {arbitration_id_str:<3}   [{msg.dlc}]  {data_str}"
-        )
+        return f"  {self.interface:<5}  {arbitration_id_str:<3}   [{msg.dlc}]  {data_str}"
 
     def connect(self):
         """Establishes connection to the CAN bus."""
         try:
-            kwargs = {"channel": self.interface, "bustype": self.bustype, "fd": True}
+            kwargs = {
+                "channel": self.interface,
+                "bustype": self.bustype,
+                "fd": True,
+            }
             if self.bitrate:
                 kwargs["bitrate"] = self.bitrate
 
@@ -88,7 +93,10 @@ class CanSniffer:
                         print(self._format_message(msg))
         except Exception as e:
             if self._running:
-                print(f"\nAn error occurred during sniffing: {e}", file=sys.stderr)
+                print(
+                    f"\nAn error occurred during sniffing: {e}",
+                    file=sys.stderr,
+                )
         finally:
             pass
 
@@ -144,7 +152,10 @@ class CanSniffer:
 
         except Exception as e:
             if self._running:
-                print(f"\nAn error occurred during sniffing: {e}", file=sys.stderr)
+                print(
+                    f"\nAn error occurred during sniffing: {e}",
+                    file=sys.stderr,
+                )
         finally:
             # Close the database connection
             conn.close()

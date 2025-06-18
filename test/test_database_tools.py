@@ -7,7 +7,8 @@ from can_logger.database_tools.database_interface import DatabaseInterface
 @pytest.fixture
 def db(mocker):
     mock_conn = mocker.patch(
-        "can_logger.database_tools.database_interface.sqlite3.connect", autospec=True
+        "can_logger.database_tools.database_interface.sqlite3.connect",
+        autospec=True,
     )
     mock_cursor = mock_conn.return_value.cursor.return_value
 
@@ -47,7 +48,9 @@ def test_check_connection_raises_without_connect():
 def test_get_all_messages_executes_query(db):
     db.get_all_messages()
 
-    db._test_cursor.execute.assert_called_once_with("SELECT * FROM can_messages", ())
+    db._test_cursor.execute.assert_called_once_with(
+        "SELECT * FROM can_messages", ()
+    )
     db._test_cursor.fetchall.assert_called_once()
 
 
@@ -77,11 +80,21 @@ def test_get_messages_by_arbitration_id_executes_query(db):
             "2025-01-01 00:00:00",
             "2025-01-01 23:59:59.999999",
         ),
-        (("2025-01-02", 14, None), "2025-01-02 14:00:00", "2025-01-02 14:59:59.999999"),
-        (("2025-01-03", 9, 15), "2025-01-03 09:15:00", "2025-01-03 09:15:59.999999"),
+        (
+            ("2025-01-02", 14, None),
+            "2025-01-02 14:00:00",
+            "2025-01-02 14:59:59.999999",
+        ),
+        (
+            ("2025-01-03", 9, 15),
+            "2025-01-03 09:15:00",
+            "2025-01-03 09:15:59.999999",
+        ),
     ],
 )
-def test_get_messages_by_datetime_builds_correct_range(db, args, start_str, end_str):
+def test_get_messages_by_datetime_builds_correct_range(
+    db, args, start_str, end_str
+):
     start_ts = datetime.strptime(start_str, "%Y-%m-%d %H:%M:%S").timestamp()
     end_ts = datetime.strptime(end_str, "%Y-%m-%d %H:%M:%S.%f").timestamp()
 

@@ -1,7 +1,7 @@
 import sqlite3
-from sqlite3 import Connection, Cursor
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+from sqlite3 import Connection, Cursor
 
 
 class DatabaseInterface:
@@ -50,10 +50,13 @@ class DatabaseInterface:
             f"SELECT * FROM {self.tab_name} ORDER BY id DESC LIMIT ?", (n,)
         )
 
-    def get_messages_by_arbitration_id(self, arbitration_id: str) -> list | None:
+    def get_messages_by_arbitration_id(
+        self, arbitration_id: str
+    ) -> list | None:
         self._check_connection()
         return self._execute_query(
-            f"SELECT * FROM {self.tab_name} WHERE arbitration_id = ?", (arbitration_id,)
+            f"SELECT * FROM {self.tab_name} WHERE arbitration_id = ?",
+            (arbitration_id,),
         )
 
     def get_messages_by_datetime(
@@ -66,7 +69,8 @@ class DatabaseInterface:
                 f"{date} {hour:02d}:{minute:02d}:00", "%Y-%m-%d %H:%M:%S"
             )
             dt_end = datetime.strptime(
-                f"{date} {hour:02d}:{minute:02d}:59.999999", "%Y-%m-%d %H:%M:%S.%f"
+                f"{date} {hour:02d}:{minute:02d}:59.999999",
+                "%Y-%m-%d %H:%M:%S.%f",
             )
         elif hour is not None:
             dt_start = datetime.strptime(
@@ -76,7 +80,9 @@ class DatabaseInterface:
                 f"{date} {hour:02d}:59:59.999999", "%Y-%m-%d %H:%M:%S.%f"
             )
         else:
-            dt_start = datetime.strptime(f"{date} 00:00:00", "%Y-%m-%d %H:%M:%S")
+            dt_start = datetime.strptime(
+                f"{date} 00:00:00", "%Y-%m-%d %H:%M:%S"
+            )
             dt_end = datetime.strptime(
                 f"{date} 23:59:59.999999", "%Y-%m-%d %H:%M:%S.%f"
             )
