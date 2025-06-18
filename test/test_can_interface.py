@@ -7,11 +7,10 @@ from can_logger.can_interface import CANInterface
 
 @pytest_asyncio.fixture
 async def can_interface(mocker):
-    mock_can_bus = mocker.patch(
-        "can_logger.can_interface.can.Bus")
+    mock_can_bus = mocker.patch("can_logger.can_interface.can.Bus")
     mock_bus = mock_can_bus.return_value
     mock_bus.recv.return_value = None
-    
+
     can_interface = CANInterface(channel="vcan0", fd_enabled=False)
 
     await can_interface.connect()
@@ -60,7 +59,6 @@ async def test_disconnect_stops_running(can_interface):
 
     assert can_interface.running is False
     assert can_interface.bus is None
-
 
 
 @pytest.mark.asyncio

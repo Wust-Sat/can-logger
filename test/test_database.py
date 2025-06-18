@@ -19,7 +19,7 @@ def msg(mocker):
 
 @pytest_asyncio.fixture
 async def db(mocker):
-    
+
     mock_conn = mocker.patch(
         "can_logger.database.aiosqlite.connect", new_callable=mocker.AsyncMock
     )
@@ -34,7 +34,7 @@ async def db(mocker):
     yield db
 
     if db.db_connected:
-      await db.disconnect()
+        await db.disconnect()
 
 
 def test_database_init(db):
@@ -99,4 +99,3 @@ async def test_disconnect_closes_cursor_and_connection(db):
     db._test_cursor.close.assert_called_once()
     db._test_conn.close.assert_called_once()
     assert db.db_connected is False
-

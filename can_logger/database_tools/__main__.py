@@ -75,7 +75,9 @@ def main(db_path, mode, n, arbitration_id, date, hour, minute):
             if not re.match(r"^\d{4}-\d{2}-\d{2}$", date):
                 print("Date must be in format YYYY-MM-DD (year-month-day).")
             else:
-                print_messages(db_interface.get_messages_by_datetime(date, hour, minute))
+                print_messages(
+                    db_interface.get_messages_by_datetime(date, hour, minute)
+                )
 
     db_interface.disconnect()
 
