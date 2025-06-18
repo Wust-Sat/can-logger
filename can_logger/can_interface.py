@@ -28,7 +28,7 @@ class CANInterface:
             self.receive_task = asyncio.create_task(self._receive_loop())
 
         except Exception as e:
-            raise
+            self.running = False
 
     async def send_frame(self, can_id, data, is_fd=True):
         pass
