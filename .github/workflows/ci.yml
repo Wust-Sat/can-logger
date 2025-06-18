@@ -16,7 +16,9 @@ jobs:
           python-version: '3.12'
 
       - name: Install Poetry
-        run: pip install poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: '1.8.2'
 
       - name: Check lock file
         run: poetry lock --check
@@ -40,7 +42,9 @@ jobs:
           python-version: '3.12'
 
       - name: Install Poetry
-        run: pip install poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: '1.8.2'
 
       - name: Check lock file
         run: poetry lock --check
@@ -50,3 +54,4 @@ jobs:
 
       - name: Run tests
         run: poetry run pytest -v
+
