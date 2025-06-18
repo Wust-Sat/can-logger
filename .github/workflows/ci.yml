@@ -1,57 +1,44 @@
-name: CI
 
 on: [push, pull_request]
 
 jobs:
   format-check:
-    name: Code Format Check
     runs-on: ubuntu-latest
-
+          
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
       - name: Install Poetry
-        uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: '1.8.2'
+        run: pip install poetry
 
-      - name: Check lock file
-        run: poetry lock --check
-
-      - name: Install dependencies (with dev)
+      - name: Install dependencies
         run: poetry install --with dev
 
-      - name: Run black check
-        run: poetry run poe black_check
-
-  unit-tests:
-    name: Unit Tests
+      - name: Run format check
+        run: poetry run poe format_check
+  
+  unit-check:
     runs-on: ubuntu-latest
-
+          
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
       - name: Install Poetry
-        uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: '1.8.2'
+        run: pip install poetry
 
-      - name: Check lock file
-        run: poetry lock --check
-
-      - name: Install dependencies (with dev)
+      - name: Install dependencies
         run: poetry install --with dev
 
-      - name: Run tests
-        run: poetry run pytest -v
+      - name: Run unit tests
+        run: poetry run poe unit_test
 
